@@ -10,17 +10,26 @@ body {
 	overflow-y: auto;
 	width: 100vw;
 	height: 100vh;
-	gap: 5px;
+	gap: 10px;
 }
 
 .message {
 	position: relative;
+	margin-bottom: -5px;
 }
 
-.name, .content {
+.nameAndBadges, .content {
 	border: 5px solid black;
 	padding: 5px;
 	width: fit-content;
+}
+
+.nameAndBadges .badge, .nameAndBadges .name {
+	vertical-align: middle;
+}
+
+.nameAndBadges .badge {
+	margin-right: 5px;
 }
 
 .content {
