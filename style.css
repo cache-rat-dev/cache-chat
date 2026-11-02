@@ -7,7 +7,7 @@
 
 body {
 	margin: 0;
-	background-color: black;
+	background-color: transparent;
 	display: flex;
 	flex-direction: column-reverse;
 	overflow-y: auto;
