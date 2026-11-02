@@ -8,11 +8,65 @@ const body = document.getElementsByTagName("body")[0];
 const socket = new WebSocket('wss://eventsub.wss.twitch.tv/ws');
 let sessionID = "";
 
-const chatID = "25821344" // ID of the user whose chat is being listened to. CURRENTLY: https://twitch.tv/shenpai
+const chatID = "247808909" // ID of the user whose chat is being listened to. CURRENTLY: https://twitch.tv/QTCinderella
 const myID = "706557723" // My ID.
 
-const bearerToken = 'Bearer 5pk0v0hmz7zq2ykasrouq6o57phjwo';
+const bearerToken = 'Bearer hmpq9rh4au1fobixy7bkzxt092eod1';
 const clientId = 'bh0d5hebkf4wv8dh8n9lf9x2ykqtqe';
+
+let channelBadges;
+
+// get the channel badges
+(async () => {
+	const url = `https://api.twitch.tv/helix/chat/badges?broadcaster_id=${chatID}`;
+
+	try {
+		const resp = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Authorization': bearerToken,
+				'Client-Id': clientId
+			}
+		})
+
+		if (!resp.ok) {
+			throw new Error('[EMOTES] Failed getting channel emotes due to HTTP error:', resp.status)
+		}
+
+		const result = await resp.json();
+		console.log("[EMOTES] Channel Emotes Loaded: ", result.data);
+		channelBadges = result.data;
+	} catch (error) {
+		console.error("[EMOTES] Failed getting channel emotes due to some error:", error)
+	}
+})();
+
+let globalBadges;
+
+// get the global badges
+(async () => {
+	const url = `https://api.twitch.tv/helix/chat/badges/global`;
+
+	try {
+		const resp = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Authorization': bearerToken,
+				'Client-Id': clientId
+			}
+		})
+
+		if (!resp.ok) {
+			throw new Error('[EMOTES] Failed getting global emotes due to HTTP error:', resp.status)
+		}
+
+		const result = await resp.json();
+		console.log("[EMOTES] Global Emotes Loaded: ", result.data);
+		globalBadges = result.data;
+	} catch (error) {
+		console.error("[EMOTES] Failed getting global emotes due to some error:", error)
+	}
+})();
 
 // The socket is open.
 socket.onopen = () => {
@@ -59,11 +113,35 @@ const formMessage = (message) => {
 	chatMsg.setAttribute('name', message.message_id);
 
 	// name
-	const chatterName = document.createElement('div');
-	chatterName.classList.add("name")
+	const chatterNameAndBadges = document.createElement('div');
+	chatterNameAndBadges.classList.add("nameAndBadges")
+
+	for (const b of message.badges) {
+		const hasChannelBadge = channelBadges.some(cb => cb.set_id === b.set_id)
+		
+		const newBadge = document.createElement('img');
+		newBadge.classList.add("badge")
+		if (hasChannelBadge) {
+			const badgeSet = channelBadges.find(cb => cb.set_id === b.set_id)
+			const badgeVersion = badgeSet.versions.find(cb => cb.id == b.id)
+			newBadge.src = badgeVersion.image_url_1x
+		} else {
+			const badgeSet = globalBadges.find(gb => gb.set_id === b.set_id)
+			const badgeVersion = badgeSet.versions.find(gb => gb.id == b.id)
+			newBadge.src = badgeVersion.image_url_1x
+		}
+
+		chatterNameAndBadges.appendChild(newBadge)
+	}
+
+	const chatterName = document.createElement('span');
+	chatterName.classList.add("name");
 	chatterName.style.color = message.color;
 	chatterName.innerText = message.chatter_user_name;
-	chatMsg.appendChild(chatterName)
+
+	chatterNameAndBadges.appendChild(chatterName);
+
+	chatMsg.appendChild(chatterNameAndBadges)
 
 	// message
 	const chatterContent = document.createElement('div');
@@ -75,12 +153,15 @@ const formMessage = (message) => {
 			const fragment = document.createElement('span');
 			fragment.innerText = f.text
 			chatterContent.appendChild(fragment)
-		}
-
-		if (f.type == "emote") {
+		} else if (f.type == "emote") {
 			const fragment = document.createElement('img');
 			const isAnimated = f.emote.format.includes('animated')
 			fragment.src = `https://static-cdn.jtvnw.net/emoticons/v2/${f.emote.id}/${isAnimated ? 'animated' : 'static'}/dark/1.0`
+			chatterContent.appendChild(fragment)
+		} else {
+			const fragment = document.createElement('span');
+			fragment.innerText = f.text
+			fragment.style.color = 'red';
 			chatterContent.appendChild(fragment)
 		}
 	}
