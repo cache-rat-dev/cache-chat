@@ -3,19 +3,16 @@
  * @author Cache Rat <crat.media@proton.me>
  */
 
-/**
- * Body element
- */
 const body = document.getElementsByTagName("body")[0];
 
-/**
- * Websocket to the Twitch API
- */
 const socket = new WebSocket('wss://eventsub.wss.twitch.tv/ws');
-/**
- * Twitch API Session ID. Empty at init, to be set later.
- */
 let sessionID = "";
+
+const chatID = "25821344" // ID of the user whose chat is being listened to. CURRENTLY: https://twitch.tv/shenpai
+const myID = "706557723" // My ID.
+
+const bearerToken = 'Bearer 5pk0v0hmz7zq2ykasrouq6o57phjwo';
+const clientId = 'bh0d5hebkf4wv8dh8n9lf9x2ykqtqe';
 
 // The socket is open.
 socket.onopen = () => {
@@ -47,21 +44,50 @@ const handleMessage = (message) => {
 
 	// If the message is a notification, it's a chat message.
 	if (type == "notification") {
-		console.log(`${message.payload.event.chatter_user_name}`, message.payload.event)
-		const chatMsg = document.createElement('div');
-		chatMsg.setAttribute('name', message.payload.event.message_id);
-
-		const chatterName = document.createElement('b');
-		chatterName.style.color = message.payload.event.color;
-		chatterName.innerText = message.payload.event.chatter_user_name;
-		chatMsg.appendChild(chatterName)
-
-		const chatterContent = document.createElement('span');
-		chatterContent.innerText = `: ${message.payload.event.message.text}`
-		chatMsg.appendChild(chatterContent)
-		
-		body.prepend(chatMsg)
+		formMessage(message.payload.event)
 	}
+}
+
+/**
+ * Let's turn this JSON data into a fully formed and styled message!
+ * @param {Object} message 
+ */
+const formMessage = (message) => {
+	// container
+	const chatMsg = document.createElement('div');
+	chatMsg.classList.add("message")
+	chatMsg.setAttribute('name', message.message_id);
+
+	// name
+	const chatterName = document.createElement('div');
+	chatterName.classList.add("name")
+	chatterName.style.color = message.color;
+	chatterName.innerText = message.chatter_user_name;
+	chatMsg.appendChild(chatterName)
+
+	// message
+	const chatterContent = document.createElement('div');
+	chatterContent.classList.add("content")
+
+	// loop over every fragment to form the message
+	for (const f of message.message.fragments) {
+		if (f.type == "mention" || f.type == "text") {
+			const fragment = document.createElement('span');
+			fragment.innerText = f.text
+			chatterContent.appendChild(fragment)
+		}
+
+		if (f.type == "emote") {
+			const fragment = document.createElement('img');
+			const isAnimated = f.emote.format.includes('animated')
+			fragment.src = `https://static-cdn.jtvnw.net/emoticons/v2/${f.emote.id}/${isAnimated ? 'animated' : 'static'}/dark/1.0`
+			chatterContent.appendChild(fragment)
+		}
+	}
+
+	chatMsg.appendChild(chatterContent)
+	
+	body.prepend(chatMsg)
 }
 
 /**
@@ -69,8 +95,6 @@ const handleMessage = (message) => {
  */
 const subscribeToChat = async () => {
 	const url = "https://api.twitch.tv/helix/eventsub/subscriptions"
-	const chatID = "62191658" // ID of the user whose chat is being listened to. CURRENTLY: https://twitch.tv/pezzzy
-	const myID = "706557723" // My ID.
 
 	const payload = {
 		type: "channel.chat.message",
@@ -89,20 +113,20 @@ const subscribeToChat = async () => {
 		const resp = await fetch(url, {
 			method: 'POST',
 			headers: {
-				'Authorization': 'Bearer 5pk0v0hmz7zq2ykasrouq6o57phjwo',
-				'Client-Id': 'bh0d5hebkf4wv8dh8n9lf9x2ykqtqe',
+				'Authorization': bearerToken,
+				'Client-Id': clientId,
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(payload)
 		});
 
 		if (!resp.ok) {
-			throw new Error(`HTTP Error: Status: ${resp.status}`)
+			throw new Error(`[SOCKET] Failed subscribing due to HTTP error: ${resp.status}`)
 		}
 
 		const result = await resp.json();
 		console.log("[SOCKET] Subscribed!", result)
 	} catch (error) {
-		console.error('Error posting:', error)
+		console.error('[SOCKET] Failed subscribing due to some error:', error)
 	}
 }
