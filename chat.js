@@ -5,7 +5,7 @@
 
 const body = document.getElementsByTagName("body")[0];
 
-const chatID = "25821344"; // ID of the user whose chat is being listened to. CURRENTLY: https://twitch.tv/shenpai
+const chatID = "706557723"; // ID of the user whose chat is being listened to. CURRENTLY: https://twitch.tv/cache_rat
 
 const clientId = "bh0d5hebkf4wv8dh8n9lf9x2ykqtqe";
 const SCOPES = "user:read:chat"; // EventSub channel.chat.message needs this one
