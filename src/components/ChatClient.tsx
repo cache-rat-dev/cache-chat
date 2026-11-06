@@ -14,7 +14,7 @@ export default function ChatClient({ accessToken }: ChatClientProps) {
 		if (!accessToken) return;
 
 		let sessionID = "";
-		const socket = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
+		let socket = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
 
 		const subscribeToChat = async (currentSessionId: string) => {
 			const url = "https://api.twitch.tv/helix/eventsub/subscriptions";
@@ -75,6 +75,7 @@ export default function ChatClient({ accessToken }: ChatClientProps) {
 
 		socket.onclose = (event) => {
 			console.warn("[SOCK] CLOSED:", event.code, event.reason);
+			socket = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
 		};
 
 		// Clean up connection when component unmounts
