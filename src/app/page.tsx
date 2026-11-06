@@ -1,18 +1,12 @@
+import ChatClient from "@/components/ChatClient";
+
 import { cookies } from "next/headers";
-import { Suspense } from "react";
 
-const CookieView = async () => {
-	const cookieStore = await cookies()
+const Chat = async () => {
+	const cookieStore = await cookies();
+	const accessToken = cookieStore.get("access_token")?.value ?? "";
 
-	return(
-		<>{cookieStore.get('access_token')?.value}</>
-	)
-}
+	return <ChatClient accessToken={accessToken} />;
+};
 
-const Chat = () => {
-	return(
-		<Suspense fallback={'Waiting for cookies...'}><CookieView/></Suspense>
-	)
-}
-
-export default Chat
+export default Chat;
