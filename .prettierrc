@@ -6,5 +6,19 @@
 	"bracketSpacing": true,
 	"quoteProps": "consistent",
 	"trailingComma": "none",
-	"objectWrap": "collapse"
+	"objectWrap": "collapse",
+	"plugins": ["@ianvs/prettier-plugin-sort-imports"],
+	"importOrder": [
+		"^react$",
+		"",
+		"@/components/(.*)$",
+		"",
+		"@/hooks/(.*)$",
+		"",
+		"@/screens/(.*)$",
+		"",
+		"@/(.*)$",
+		"",
+		"<THIRD_PARTY_MODULES>"
+	]
 }
