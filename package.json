@@ -1,0 +1,25 @@
+{
+	"name": "cache-chat",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "prettier --write ."
+	},
+	"dependencies": {
+		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+		"next": "16.4.5",
+		"prettier": "^3.9.10",
+		"react": "19.3.0",
+		"react-dom": "19.3.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"babel-plugin-react-compiler": "1.0.0",
+		"typescript": "^5"
+	}
+}
