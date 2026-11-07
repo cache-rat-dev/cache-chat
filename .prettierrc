@@ -1,0 +1,24 @@
+{
+	"tabWidth": 4,
+	"useTabs": true,
+	"arrowParens": "always",
+	"bracketSameLine": false,
+	"bracketSpacing": true,
+	"quoteProps": "consistent",
+	"trailingComma": "none",
+	"objectWrap": "collapse",
+	"plugins": ["@ianvs/prettier-plugin-sort-imports"],
+	"importOrder": [
+		"^react$",
+		"",
+		"@/components/(.*)$",
+		"",
+		"@/hooks/(.*)$",
+		"",
+		"@/screens/(.*)$",
+		"",
+		"@/(.*)$",
+		"",
+		"<THIRD_PARTY_MODULES>"
+	]
+}
