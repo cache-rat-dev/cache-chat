@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const ChatSocket = () => {
+	const [messages, setMessages] = useState<{ username: string; message: string;}[]>([]);
+
 	useEffect(() => {
 		let socket = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
 
@@ -13,18 +15,19 @@ const ChatSocket = () => {
 			}
 
 			if (event.includes('PRIVMSG')) {
-				const username = event.split('!')[0].replace(':', '')
-				const message = event.split('PRIVMSG #shenpai :')[1].trim()
+				// const username = event.split('!')[0].replace(':', '')
+				// const message = event.split('PRIVMSG #kaicenat :')[1].trim()
 
-				console.log(`${username}: ${message}`)
+				// setMessages((prev) => [...prev.slice(-49), { username, message }]);
+				setMessages((prev) => [...prev.slice(-49), { username: '', message: event.replace(':', '__________') }])
 			}
 		};
 
 		socket.onopen = () => {
 			console.log(`[SOCK] Connected`);
-			// socket.send('CAP REQ :twitch.tv/tags')
+			socket.send('CAP REQ :twitch.tv/tags')
 			socket.send('NICK justinfan22243');
-			socket.send(`JOIN #shenpai`)
+			socket.send(`JOIN #kaicenat`)
 		};
 
 		socket.onmessage = (event) => {
@@ -38,7 +41,13 @@ const ChatSocket = () => {
 		return () => socket.close();
 	}, []);
 
-	return null;
+	return (
+		<div>
+			{messages.map((message, idx) => (
+				<p key={idx}>{message.message}</p>
+			))}
+		</div>
+	);
 };
 
 export default ChatSocket;
