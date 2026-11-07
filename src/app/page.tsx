@@ -1,13 +1,10 @@
-import { retrieveAccessToken } from "@/lib/twitch";
+import ChatSocket from "@/lib/twitch/socket";
 
-export const instant = false
+export const instant = false;
 
 const Chat = async () => {
-	const token = await retrieveAccessToken();
 
-	return (
-		<>{token}</>
-	);
-}
+	return <>{<ChatSocket />}</>;
+};
 
 export default Chat;
