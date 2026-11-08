@@ -1,12 +1,16 @@
 /**
- * Logic for the handling of {@link Badge Badges}.
- * @module
+ * Logic for the handling of {@link IBadge Badges}.
+ * @module badge
  */
+
+import type { IBadge } from "@/lib/twitch/types";
+
+export type { IBadge } from "@/lib/twitch/types";
 
 /**
  * A Twitch Badge. It consists of the badge's ID and its version.
  */
-export class Badge {
+export class Badge implements IBadge {
 	public id!: string;
 	public version!: string;
 
@@ -46,7 +50,7 @@ export class Badge {
 }
 
 /**
- * Parses a comma-separated badge string into {@link Badge} objects.
+ * Parses a comma-separated badge string into {@link IBadge} objects.
  *
  * Each entry is split at `/` into ID and version. An entry without a `/` gets an empty string for a version.
  *
