@@ -1,5 +1,5 @@
 /**
- * Logic for the handling of {@link IBadge Badges}.
+ * Logic for the handling of {@link Badge Badges}.
  * @module badge
  */
 

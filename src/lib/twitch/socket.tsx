@@ -9,12 +9,11 @@ import { useEffect, useState } from "react";
 import { insert_emotes } from "@/lib/twitch/emote";
 import { Message } from "@/lib/twitch/message";
 import { Tags } from "@/lib/twitch/tags";
-import { IMessage } from "@/lib/twitch/types";
 
-const username = "cache_rat";
+const username = "shenpai";
 
 const ChatSocket = () => {
-	const [messages, setMessages] = useState<IMessage[]>([]);
+	const [messages, setMessages] = useState<Message[]>([]);
 
 	useEffect(() => {
 		let socket = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
