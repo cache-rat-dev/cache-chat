@@ -1,33 +1,35 @@
 /**
- * Logic for the handling of {@link Emote Emotes}.
- * @module
+ * Logic for the handling of {@link IEmote Emotes}.
+ * @module emote
  */
 
-/**
- * An Emote. It consists of the emote's ID and its placement within its parent {@link ChatMessage}, defined as an array of indice pairs.
- */
-export interface Emote {
-	id: string;
-	ranges: { start: number; end: number }[];
-}
+import type { IEmote } from "@/lib/twitch/types";
 
-const handle_emote = (emote: string): Emote => {
-	const [id, ranges_string] = emote.split(":");
-	const ranges = ranges_string.split(",").map((range) => {
+export type { IEmote } from "@/lib/twitch/types";
+
+export class Emote implements IEmote {
+	id!: string;
+	ranges!: { start: number; end: number; }[];
+	
+	constructor(raw_emote_string : string) {
+		const [id, ranges_string] = raw_emote_string.split(":");
+		const ranges = ranges_string.split(",").map((range) => {
 		const [start, end] = range.split("-").map((n) => Number(n));
 
 		return { start: start, end: end };
 	});
 
-	return { id: id, ranges: ranges };
-};
+	this.id = id;
+	this.ranges = ranges;
+	}
+}
 
 const convert_emote_string_to_emotes = (
 	emote_string: string
 ): Emote[] | undefined => {
 	if (emote_string === "") return undefined;
 
-	const emotes = emote_string.split("/").map(handle_emote);
+	const emotes = emote_string.split("/").map((emote) => new Emote(emote));
 
 	return emotes.length > 0 ? emotes : undefined;
 };
