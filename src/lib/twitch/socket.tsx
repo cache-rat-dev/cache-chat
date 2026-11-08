@@ -151,13 +151,15 @@ const ChatSocket = () => {
 		let emotes = convert_emote_string_to_emotes(tag["emotes"]);
 		if (emotes) chat_tags.emotes = emotes;
 
-		/* 
-		TODO:
-		- ID,
-		- Subscriber Status,
-		- Sent Time,
-		- User ID and Type
-		*/
+		chat_tags.id = tag['id']
+
+		chat_tags.subscriber = Boolean(Number(tag['subscriber']))
+
+		chat_tags.time_sent_ts = Number(tag['tmi-sent-ts'])
+
+		chat_tags.user_id = Number(tag['user-id'])
+		
+		chat_tags.user_type = tag['user-type']
 
 		return chat_tags;
 	};
