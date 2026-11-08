@@ -1,27 +1,20 @@
 /**
  * Chat Socket
- * @module
+ * @module socket
  */
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { insert_emotes } from "@/lib/twitch/emote";
-import { ChatTags, parse_tags } from "@/lib/twitch/tags";
+import { Message } from "@/lib/twitch/message";
+import { Tags } from "@/lib/twitch/tags";
+import { IMessage } from "@/lib/twitch/types";
 
 const username = "kaicenat";
 
-/**
- * What it says on the tin. Contains the chat message's username, message contents and the {@link ChatTags tags} associated with that message.
- */
-export interface ChatMessage {
-	tags: ChatTags;
-	username: string;
-	message: ReactNode;
-}
-
 const ChatSocket = () => {
-	const [messages, setMessages] = useState<ChatMessage[]>([]);
+	const [messages, setMessages] = useState<IMessage[]>([]);
 
 	useEffect(() => {
 		let socket = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
@@ -34,7 +27,7 @@ const ChatSocket = () => {
 
 			if (event.includes("PRIVMSG")) {
 				const sep = event.indexOf(" ");
-				let info = parse_tags(event.slice(0, sep));
+				let info = new Tags(event.slice(0, sep));
 				let content = event.slice(sep + 1);
 
 				const matchString = ` PRIVMSG #${username} :`;
@@ -49,11 +42,11 @@ const ChatSocket = () => {
 
 					setMessages((prev) => [
 						...prev.slice(-49),
-						{
-							tags: info,
-							username: user,
-							message: insert_emotes(info.emotes ?? [], msg)
-						}
+						new Message(
+							user,
+							insert_emotes(info.emotes ?? [], msg),
+							info
+						)
 					]);
 				}
 			}
