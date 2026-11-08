@@ -76,6 +76,101 @@ const ChatSocket = () => {
 		{ username: string; message: string }[]
 	>([]);
 
+	/**
+	 * Convert badge strings into an array of Badges... or return nothing
+	 * @param badge_string Raw string of badge information
+	 * @returns { Badge[] | undefined } Array of Badge objects, or nothing if there aren't any badges
+	 */
+	const convert_badge_string_to_badges = (
+		badge_string: string
+	): Badge[] | undefined => {
+		// If the badge string is empty, there's no badges, and we're done here.
+		if (badge_string === "") return undefined;
+
+		/**
+		 * Convert a badge string into a Badge.
+		 * @param badge An individual badge string of format {id}/{version}
+		 * @returns { Badge } Badge object
+		 */
+		const handle_badge = (badge: string): Badge => {
+			const slash = badge.indexOf("/");
+			return slash === -1
+				? { id: badge, version: "" }
+				: {
+						id: badge.slice(0, slash),
+						version: badge.slice(slash + 1)
+					};
+		};
+
+		/**
+		 * Get all the badges!
+		 */
+		const badges = badge_string
+			.split(",")
+			.map(handle_badge);
+
+		// If there's no badges, return undefined. Otherwise, return the existing badges.
+		return badges.length > 0 ? badges : undefined;
+	};
+
+	const parse_tags = (raw_tags_string: string) : ChatTags => {
+		const cleaned_tags_string = raw_tags_string.slice(1) // Remove the '@' at the start of the string
+		const tags_array = cleaned_tags_string.split(";") // Split the string into its individual tags.
+
+		/**
+		 * Convert the array into an Object, for better access.
+		 */
+		const tag = tags_array.reduce((acc: any, current: any) => {
+			const [key, ...valueParts] = current.split("=");
+
+			if (key) {
+				const value = valueParts.join("=").trim();
+				acc[key.trim()] = value;
+			}
+
+			return acc;
+		}, {});
+
+		// This is where we start populating the chat tags.
+		let chat_tags: any = {};
+
+		// BADGE INFO
+		let badge_info = convert_badge_string_to_badges(tag["badge-info"]);
+		if (badge_info) chat_tags.badge_info = badge_info;
+
+		// BADGES
+		let badges = convert_badge_string_to_badges(tag["badges"]);
+		if (badges) chat_tags.badges = badges;
+
+		// BITS
+		let bits = tag['bits']
+		if (bits) chat_tags.bits = bits;
+
+		// COLOR
+		chat_tags.color = tag['color'] ?? '#ff0000';
+
+		// DISPLAY NAME
+		chat_tags.display_name = tag['display-name'] ?? 'Anonymous';
+
+		/* 
+		TODO:
+		- Emotes,
+		- GIFs,
+		- ID,
+		- Mod,
+		- Replies,
+		- Room ID,
+		- Source Information,
+		- Subscriber Status,
+		- Sent Time,
+		- Turbo Status,
+		- User ID and Type,
+		- VIP Status
+		*/
+
+		return chat_tags;
+	};
+
 	useEffect(() => {
 		let socket = new WebSocket("wss://irc-ws.chat.twitch.tv:443");
 
@@ -90,7 +185,13 @@ const ChatSocket = () => {
 				// const message = event.split('PRIVMSG #kaicenat :')[1].trim()
 
 				// setMessages((prev) => [...prev.slice(-49), { username, message }]);
-				setMessages((prev) => [...prev.slice(-49), { username: '', message: event.replace(':', '__________') }])
+				let [info, user, message] = event.split(":");
+				info = parse_tags(info);
+				console.log(info)
+				setMessages((prev) => [
+					...prev.slice(1),
+					{ username: "", message: event }
+				]);
 			}
 		};
 
