@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const username = "kaicenat";
+const username = "shenpai";
 
 /**
  * Defines a Badge, which consists of its ID and its version
@@ -21,29 +21,6 @@ interface Emote {
 }
 
 /**
- * Defines a GIF, which consists of its start and end range in a chat message, its ID and its URL
- */
-interface GIF {
-	start: number;
-	end: number;
-	id: string;
-	url: string;
-}
-
-/**
- * Defines information supplied if the chat message is in response to another.
- */
-interface Reply {
-	parent_msg_id: string;
-	parent_user_id: number;
-	parent_user_login: string;
-	parent_display_name: string;
-	parent_msg_body: string;
-	thread_parent_msg_id: string;
-	thread_parent_user_login: string;
-}
-
-/**
  * Defines a chat message's tags
  */
 interface ChatTags {
@@ -53,22 +30,11 @@ interface ChatTags {
 	color: string; // may be "" if never set
 	display_name: string; // may be "" if never set
 	emotes?: Emote[];
-	gifs?: GIF[];
 	id: string;
-	mod: boolean;
-	reply?: Reply;
-	room_id: number;
-	source_badges?: Badge[];
-	source_badge_info?: Badge[];
-	source_id?: string; // shared chat only
-	source_room_id?: number; // shared chat only
-	source_only?: boolean; // shared chat only
 	subscriber: boolean;
 	tmi_sent_ts: number;
-	turbo: boolean;
 	user_id: number;
 	user_type: "" | "admin" | "global_mod" | "staff";
-	vip: boolean; // true iff the tag is present
 }
 
 const ChatSocket = () => {
@@ -105,17 +71,46 @@ const ChatSocket = () => {
 		/**
 		 * Get all the badges!
 		 */
-		const badges = badge_string
-			.split(",")
-			.map(handle_badge);
+		const badges = badge_string.split(",").map(handle_badge);
 
 		// If there's no badges, return undefined. Otherwise, return the existing badges.
 		return badges.length > 0 ? badges : undefined;
 	};
 
-	const parse_tags = (raw_tags_string: string) : ChatTags => {
-		const cleaned_tags_string = raw_tags_string.slice(1) // Remove the '@' at the start of the string
-		const tags_array = cleaned_tags_string.split(";") // Split the string into its individual tags.
+	/**
+	 * Convert emote strings into an array of Emotes... or return nothing
+	 * @param emote_string Raw string of emotes information
+	 * @returns { Emote[] | undefined } Array of Emote objects, or nothing if there aren't any badges
+	 */
+	const convert_emote_string_to_emotes = (
+		emote_string: string
+	): Emote[] | undefined => {
+		if (emote_string === "") return undefined;
+
+		/**
+		 * Convert an emote string into an Emote.
+		 * @param emote An individual emote string of format {id}/{ranges}
+		 * @returns { Emote } Emote object
+		 */
+		const handle_emote = (emote: string): Emote => {
+			const [id, ranges_string] = emote.split(":");
+			const ranges = ranges_string.split(",").map((range) => {
+				const [start, end] = range.split("-").map((n) => Number(n));
+
+				return { start: start, end: end };
+			});
+
+			return { id: id, ranges: ranges };
+		};
+
+		const emotes = emote_string.split("/").map(handle_emote);
+
+		return emotes.length > 0 ? emotes : undefined;
+	};
+
+	const parse_tags = (raw_tags_string: string): ChatTags => {
+		const cleaned_tags_string = raw_tags_string.slice(1); // Remove the '@' at the start of the string
+		const tags_array = cleaned_tags_string.split(";"); // Split the string into its individual tags.
 
 		/**
 		 * Convert the array into an Object, for better access.
@@ -143,29 +138,25 @@ const ChatSocket = () => {
 		if (badges) chat_tags.badges = badges;
 
 		// BITS
-		let bits = tag['bits']
+		let bits = tag["bits"];
 		if (bits) chat_tags.bits = bits;
 
 		// COLOR
-		chat_tags.color = tag['color'] ?? '#ff0000';
+		chat_tags.color = tag["color"] ?? "#ff0000";
 
 		// DISPLAY NAME
-		chat_tags.display_name = tag['display-name'] ?? 'Anonymous';
+		chat_tags.display_name = tag["display-name"] ?? "Anonymous";
+
+		// EMOTES
+		let emotes = convert_emote_string_to_emotes(tag["emotes"]);
+		if (emotes) chat_tags.emotes = emotes;
 
 		/* 
 		TODO:
-		- Emotes,
-		- GIFs,
 		- ID,
-		- Mod,
-		- Replies,
-		- Room ID,
-		- Source Information,
 		- Subscriber Status,
 		- Sent Time,
-		- Turbo Status,
-		- User ID and Type,
-		- VIP Status
+		- User ID and Type
 		*/
 
 		return chat_tags;
@@ -185,9 +176,9 @@ const ChatSocket = () => {
 				// const message = event.split('PRIVMSG #kaicenat :')[1].trim()
 
 				// setMessages((prev) => [...prev.slice(-49), { username, message }]);
-				let [info, user, message] = event.split(":");
+				let [info, content] = event.split(" ", 1);
 				info = parse_tags(info);
-				console.log(info)
+				console.log(info);
 				setMessages((prev) => [
 					...prev.slice(1),
 					{ username: "", message: event }
