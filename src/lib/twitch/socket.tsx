@@ -37,10 +37,14 @@ interface ChatTags {
 	user_type: "" | "admin" | "global_mod" | "staff";
 }
 
+interface ChatMessage {
+	tags: ChatTags,
+	username: string,
+	message: string
+}
+
 const ChatSocket = () => {
-	const [messages, setMessages] = useState<
-		{ username: string; message: string }[]
-	>([]);
+	const [messages, setMessages] = useState<ChatMessage[]>([]);
 
 	/**
 	 * Convert badge strings into an array of Badges... or return nothing
@@ -174,16 +178,20 @@ const ChatSocket = () => {
 			}
 
 			if (event.includes("PRIVMSG")) {
-				// const username = event.split('!')[0].replace(':', '')
-				// const message = event.split('PRIVMSG #kaicenat :')[1].trim()
+				const sep = event.indexOf(' ');
 
-				// setMessages((prev) => [...prev.slice(-49), { username, message }]);
-				let [info, content] = event.split(" ", 1);
-				info = parse_tags(info);
-				console.log(info);
+				let info = parse_tags(event.slice(0, sep));
+
+				let content = event.slice(sep + 1);
+				// console.log(info, content);
+
+				let [user, msg] = content.replaceAll(":", '').split(` PRIVMSG #${username} `)
+				user = user.split("!", 1)[0]
+				msg = msg.trim()
+
 				setMessages((prev) => [
-					...prev.slice(1),
-					{ username: "", message: event }
+					...prev.slice(-49),
+					{ tags: info, username: user, message: msg }
 				]);
 			}
 		};
@@ -209,7 +217,7 @@ const ChatSocket = () => {
 	return (
 		<div>
 			{messages.map((message, idx) => (
-				<p key={idx}>{message.message}</p>
+				<p key={idx}><span style={{color: message.tags.color}}>{message.username}</span>: {message.message}</p>
 			))}
 		</div>
 	);
