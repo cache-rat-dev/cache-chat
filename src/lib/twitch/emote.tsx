@@ -58,7 +58,7 @@ const insert_emotes = (emotes: Emote[], message: string) => {
 		elements.push(
 			<img
 				key={`${r.id}-${index}`}
-				src={`https://static-cdn.jtvnw.net/emoticons/v2/${r.id}/static/dark/2.0`}
+				src={`https://static-cdn.jtvnw.net/emoticons/v2/${r.id}/static/dark/1.0`}
 				alt={message.slice(r.start, r.end + 1)}
 			/>
 		);

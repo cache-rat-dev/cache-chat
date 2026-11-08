@@ -11,7 +11,7 @@ import { Message } from "@/lib/twitch/message";
 import { Tags } from "@/lib/twitch/tags";
 import { IMessage } from "@/lib/twitch/types";
 
-const username = "kaicenat";
+const username = "cache_rat";
 
 const ChatSocket = () => {
 	const [messages, setMessages] = useState<IMessage[]>([]);
@@ -41,7 +41,7 @@ const ChatSocket = () => {
 					const user = prefix.split("!", 1)[0].replace(/^:/, "");
 
 					setMessages((prev) => [
-						...prev.slice(-49),
+						...prev.slice(-29),
 						new Message(
 							user,
 							insert_emotes(info.emotes ?? [], msg),
@@ -54,12 +54,13 @@ const ChatSocket = () => {
 
 		socket.onopen = () => {
 			console.log(`[SOCK] Connected`);
-			socket.send("CAP REQ :twitch.tv/tags");
+			socket.send("CAP REQ :twitch.tv/tags twitch.tv/commands");
 			socket.send("NICK justinfan22243");
 			socket.send(`JOIN #${username}`);
 		};
 
 		socket.onmessage = (event) => {
+			console.log("[SOCK] Message: ", event.data)
 			handle_message(event.data);
 		};
 
