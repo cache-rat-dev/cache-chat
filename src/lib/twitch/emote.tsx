@@ -1,5 +1,5 @@
 /**
- * Logic for the handling of {@link IEmote Emotes}.
+ * Logic for the handling of {@link Emote Emotes}.
  * @module emote
  */
 
