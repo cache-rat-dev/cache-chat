@@ -5,6 +5,8 @@ import "./globals.css";
 
 import { Suspense } from "react";
 
+import { ChatProvider } from "@/lib/twitch/ChatProvider";
+
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 const geistMono = Geist_Mono({
@@ -24,9 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 			className={`${geistSans.variable} ${geistMono.variable}`}
 		>
 			<body>
-				<Suspense fallback={<div>Loading Cache Chat...</div>}>
-					{children}
-				</Suspense>
+				<ChatProvider channel="snapscube">{children}</ChatProvider>
 			</body>
 		</html>
 	);

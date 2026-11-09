@@ -1,9 +1,22 @@
-import ChatSocket from "@/lib/twitch/socket";
+"use client";
 
-export const instant = false;
+import { useChat } from "@/hooks/useChat";
 
-const Chat = async () => {
-	return <>{<ChatSocket />}</>;
+const Chat = () => {
+	const { messages } = useChat();
+
+	return (
+		<div>
+			{messages.map((m) => (
+				<div key={m.meta?.id}>
+					<span style={{ color: m.meta?.color }}>
+						{m.meta?.["display-name"]}
+					</span>
+					: {m.content}
+				</div>
+			))}
+		</div>
+	);
 };
 
 export default Chat;
