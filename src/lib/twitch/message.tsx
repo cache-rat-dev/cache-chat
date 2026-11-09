@@ -1,22 +1,94 @@
-/**
- * @module message
- */
+import { Emote } from "./Emote";
 
-import { ReactNode } from "react";
+export class Message {
+	meta: Record<string, any> = {};
+	type: string;
+	rawContent: string;
+	content!: React.ReactNode[] | string;
 
-import { Tags } from "@/lib/twitch/tags";
-import type { IMessage } from "@/lib/twitch/types";
+	// Make constructor private so it's only called with valid data
+	private constructor(raw: string) {
+		const spaceIdx = raw.indexOf(" ");
+		const rawMeta = raw.slice(0, spaceIdx).trim();
+		const rest = raw.slice(spaceIdx).trim();
 
-export type { IMessage } from "@/lib/twitch/types";
+		const splitContent = rest.split(":").filter((c) => c !== "");
+		this.type = splitContent[0].split(" ")[1];
+		this.rawContent = splitContent[1];
 
-export class Message implements IMessage {
-	tags!: Tags;
-	username!: string;
-	message: ReactNode;
+		this.meta = rawMeta
+			.slice(1)
+			.split(";")
+			.reduce((acc: Record<string, any>, cur: string) => {
+				const [key, ...valueParts] = cur.split("=");
+				if (key) {
+					acc[key.trim()] = valueParts.join("=").trim();
+				}
+				return acc;
+			}, {});
 
-	constructor(username: string, message: ReactNode, tags: Tags) {
-		this.username = username;
-		this.message = message;
-		this.tags = tags;
+		if (this.type === "PRIVMSG") {
+			this.meta.emotes = this.meta.emotes
+				? this.meta.emotes.split("/").map((e: string) => new Emote(e))
+				: undefined;
+
+			if (!this.meta.emotes) {
+				this.content = this.rawContent;
+			} else {
+				const replacements = this.meta.emotes.flatMap((e: Emote) =>
+					e.ranges
+						.map((r) => ({
+							start: r.start,
+							end: r.end,
+							id: e.id,
+							url: e.url
+						}))
+						.sort((a, b) => a.start - b.start)
+				);
+
+				const els: React.ReactNode[] = [];
+				let lastIdx = 0;
+
+				replacements.forEach(
+					(
+						r: {
+							start: number;
+							end: number;
+							id: string;
+							url: string;
+						},
+						idx: number
+					) => {
+						if (r.start > lastIdx) {
+							els.push(this.rawContent.slice(lastIdx, r.start));
+						}
+
+						els.push(
+							<img
+								key={`${r.id}-${idx}`}
+								src={r.url}
+								alt={this.rawContent.slice(r.start, r.end + 1)}
+							/>
+						);
+
+						lastIdx = r.end + 1;
+					}
+				);
+
+				if (lastIdx < this.rawContent.length) {
+					els.push(this.rawContent.slice(lastIdx));
+				}
+
+				this.content = els;
+			}
+		}
+	}
+
+	// Static factory method handles validation before instantiation
+	static fromRaw(raw: string): Message | null {
+		if (!raw.includes("ROOMSTATE") && !raw.includes("PRIVMSG")) {
+			return null;
+		}
+		return new Message(raw);
 	}
 }
