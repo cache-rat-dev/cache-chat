@@ -10,7 +10,7 @@ import { insert_emotes } from "@/lib/twitch/emote";
 import { Message } from "@/lib/twitch/message";
 import { Tags } from "@/lib/twitch/tags";
 
-const username = "shenpai";
+const username = "cache_rat";
 
 const ChatSocket = () => {
 	const [messages, setMessages] = useState<Message[]>([]);
