@@ -23,7 +23,21 @@ export async function generateMetadata({
 				description:
 					"Windows 98 styled chat source for Twitch channels. Free, too!",
 				siteName: "Cache Rat",
-				images: ["/cached_file_thumbnail.png"]
+				images: [
+					{
+						url: "https://chat.cacherat.dev/cached_file_thumbnail.png",
+						width: 101,
+						height: 101,
+						alt: "Cache Chat Thumbnail"
+					}
+				]
+			},
+			twitter: {
+				card: "summary",
+				title: "Cache Chat, by Cache Rat",
+				description:
+					"Windows 98 styled chat source for Twitch channels. Free, too!",
+				images: ["https://chat.cacherat.dev/cached_file_thumbnail.png"]
 			}
 		};
 
@@ -36,7 +50,21 @@ export async function generateMetadata({
 			description:
 				"Windows 98 styled chat source for Twitch channels. Free, too!",
 			siteName: "Cache Rat",
-			images: ["/cached_file_thumbnail.png"]
+			images: [
+				{
+					url: "https://chat.cacherat.dev/cached_file_thumbnail.png",
+					width: 101,
+					height: 101,
+					alt: "Cache Chat Thumbnail"
+				}
+			]
+		},
+		twitter: {
+			card: "summary",
+			title: "Cache Chat, by Cache Rat",
+			description:
+				"Windows 98 styled chat source for Twitch channels. Free, too!",
+			images: ["https://chat.cacherat.dev/cached_file_thumbnail.png"]
 		}
 	};
 }
