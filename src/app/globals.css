@@ -73,7 +73,8 @@ input {
 	flex: 1;
 }
 
-input, button {
+input,
+button {
 	appearance: none;
 	padding: 4px;
 	box-shadow:
@@ -95,7 +96,8 @@ input, button {
 	height: 50px;
 }
 
-.content img, .content span {
+.content img,
+.content span {
 	vertical-align: middle;
 }
 
