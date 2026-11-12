@@ -8,7 +8,7 @@ export class Message {
 	badges!: string[];
 	type: string;
 	rawContent: string;
-	content!: React.ReactNode[] | string;
+	content!: React.ReactNode[] | string | React.ReactNode;
 
 	private constructor(raw: string) {
 		const spaceIdx = raw.indexOf(" ");
@@ -17,7 +17,7 @@ export class Message {
 
 		const splitContent = rest.split(":").filter((c) => c !== "");
 		this.type = splitContent[0].split(" ")[1];
-		this.rawContent = splitContent[1];
+		this.rawContent = splitContent.slice(1).join(":");
 
 		this.meta = rawMeta
 			.slice(1)
@@ -31,14 +31,14 @@ export class Message {
 			}, {});
 
 		if (this.type === "PRIVMSG") {
-			this.badges = this.meta.badges.split(",")
+			this.badges = this.meta.badges.split(",");
 
 			this.meta.emotes = this.meta.emotes
 				? this.meta.emotes.split("/").map((e: string) => new Emote(e))
 				: undefined;
 
 			if (!this.meta.emotes) {
-				this.content = this.rawContent;
+				this.content = <span>{this.rawContent}</span>;
 			} else {
 				const replacements = this.meta.emotes.flatMap((e: Emote) =>
 					e.ranges
@@ -65,7 +65,7 @@ export class Message {
 						idx: number
 					) => {
 						if (r.start > lastIdx) {
-							els.push(this.rawContent.slice(lastIdx, r.start));
+							els.push(<span>{this.rawContent.slice(lastIdx, r.start)}</span>);
 						}
 
 						els.push(
@@ -81,7 +81,7 @@ export class Message {
 				);
 
 				if (lastIdx < this.rawContent.length) {
-					els.push(this.rawContent.slice(lastIdx));
+					els.push(<span>{this.rawContent.slice(lastIdx)}</span>);
 				}
 
 				this.content = els;
