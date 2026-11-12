@@ -62,11 +62,56 @@ body {
 	background-color: white;
 }
 
+.form {
+	display: flex;
+	margin: auto;
+	gap: 2px;
+	margin-top: 6px;
+}
+
+input {
+	flex: 1;
+}
+
+input, button {
+	appearance: none;
+	padding: 4px;
+	box-shadow:
+		inset 2px 2px 0px rgba(255, 255, 255, 0.8),
+		inset -2px -2px 0px rgba(0, 0, 0, 0.2);
+}
+
+.copied {
+	background-color: #00ff00;
+	appearance: none;
+	padding: 4px;
+	box-shadow:
+		inset 2px 2px 0px rgba(255, 255, 255, 0.8),
+		inset -2px -2px 0px rgba(0, 0, 0, 0.2);
+}
+
 .content:has(> img:only-child) img {
 	aspect-ratio: 1/1;
 	height: 50px;
 }
 
-.content * {
+.content img, .content span {
 	vertical-align: middle;
+}
+
+.splash {
+	position: fixed;
+	top: 0;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	width: 100vw;
+	min-height: 100vh;
+	align-items: center;
+	justify-content: center;
+}
+
+.splash .message_container {
+	margin: 0;
 }

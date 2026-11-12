@@ -60,6 +60,18 @@ function rgbToHue(r: number, g: number, b: number) {
 	return hue;
 }
 
+const css_gradient = (color: string) => {
+	if (color === "") color = "#ff0000";
+	const { r, g, b } = hexToRgb(color);
+	const hue = rgbToHue(r, g, b);
+
+	// return { '--gradient-stop-1': `hsl(${hue} 100% 25%)`, '--gradient-stop-2': `hsl(${hue - 36} 100% 41%)`} as CSSProperties
+	return {
+		background: `linear-gradient(to right, hsl(${hue} 100% 25%), hsl(${hue} 100% 41%))`
+	} as CSSProperties;
+	// return { 'background': `hsl(${hue} 100% 50%`}
+};
+
 const Chat = () => {
 	const { messages, badges } = useChat();
 
@@ -75,18 +87,6 @@ const Chat = () => {
 		}
 
 		return <img key={`${badge_string}-${index}`} src={url} />;
-	};
-
-	const css_gradient = (color: string) => {
-		if (color === "") color = "#ff0000";
-		const { r, g, b } = hexToRgb(color);
-		const hue = rgbToHue(r, g, b);
-
-		// return { '--gradient-stop-1': `hsl(${hue} 100% 25%)`, '--gradient-stop-2': `hsl(${hue - 36} 100% 41%)`} as CSSProperties
-		return {
-			background: `linear-gradient(to right, hsl(${hue} 100% 25%), hsl(${hue} 100% 41%))`
-		} as CSSProperties;
-		// return { 'background': `hsl(${hue} 100% 50%`}
 	};
 
 	return (
