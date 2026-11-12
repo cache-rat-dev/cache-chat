@@ -8,7 +8,7 @@ export class Message {
 	badges!: string[];
 	type: string;
 	rawContent: string;
-	content!: React.ReactNode[] | string | React.ReactNode;
+	content!: React.ReactNode[] | string
 
 	private constructor(raw: string) {
 		const spaceIdx = raw.indexOf(" ");
@@ -38,7 +38,7 @@ export class Message {
 				: undefined;
 
 			if (!this.meta.emotes) {
-				this.content = <span>{this.rawContent}</span>;
+				this.content = this.rawContent;
 			} else {
 				const replacements = this.meta.emotes.flatMap((e: Emote) =>
 					e.ranges
