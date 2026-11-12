@@ -58,12 +58,12 @@ body {
 	padding: 4px;
 	box-shadow:
 		inset 2px 2px 0px rgba(0, 0, 0, 0.6),
-		inset -2px -2px 0px rgba(0,0,0, 0.2);
+		inset -2px -2px 0px rgba(0, 0, 0, 0.2);
 	background-color: white;
 }
 
 .content:has(> img:only-child) img {
-	width: 50px;
+	aspect-ratio: 1/1;
 	height: 50px;
 }
 
