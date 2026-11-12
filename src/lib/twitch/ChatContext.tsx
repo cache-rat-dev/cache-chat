@@ -1,13 +1,24 @@
+/**
+ * @module ChatContext
+ */
 "use client";
 
 import { createContext } from "react";
 
-import { Message } from "./Message";
+import { Message } from "@/lib/twitch/Message";
+import { IBadge } from "./Badge";
 
-interface IChatContext {
+/**
+ * Defines variables that will be used across the Chat Source code.
+ */
+export interface IChatContext {
 	messages: Message[];
-	badges: Record<string, any>;
+	token: string;
+	badges: Record<string, IBadge>;
 	broadcasterID: string;
 }
 
+/**
+ * Method for providing a ChatContext.
+ */
 export const ChatContext = createContext<IChatContext | null>(null);
