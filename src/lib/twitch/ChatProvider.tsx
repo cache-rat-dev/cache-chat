@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { ChatContext } from "@/lib/twitch/ChatContext";
 import { Message } from "@/lib/twitch/Message";
+
 import { get_access_token } from "./Auth";
 import { get_channel_badges, get_global_badges, IBadge } from "./Badge";
 
@@ -24,7 +25,7 @@ export const ChatProvider: React.FC<{
 	const [hasChannelBadges, setHasChannelBadges] = useState(false);
 
 	const [messages, setMessages] = useState<Message[]>([]); // bank for messages
-	const [badges, setBadges] = useState<Record<string, IBadge>>({}) // bank for badges
+	const [badges, setBadges] = useState<Record<string, IBadge>>({}); // bank for badges
 	const [token, setToken] = useState<string>(""); // bank for token
 	const [broadcasterID, setBroadcasterID] = useState<string>(""); // bank for broadcaster id
 
@@ -35,46 +36,50 @@ export const ChatProvider: React.FC<{
 		let noToken = true;
 
 		get_access_token()
-		.then((t) => {
-			if (noToken) setToken(t.access_token);
-		})
-		.catch((err) => console.error(err));
+			.then((t) => {
+				if (noToken) setToken(t.access_token);
+			})
+			.catch((err) => console.error(err));
 
 		return () => {
 			noToken = false;
 			setHasToken(true);
-		}
-	}, [])
+		};
+	}, []);
 
 	useEffect(() => {
 		if (!token) return;
 
 		get_global_badges(token).then((globBadges) => {
-			const badgeList = Array.isArray(globBadges) ? globBadges : globBadges?.data
+			const badgeList = Array.isArray(globBadges)
+				? globBadges
+				: globBadges?.data;
 			badgeList.forEach((badge: IBadge) => {
 				setBadges((prevBadges) => ({
 					...prevBadges,
 					[badge.set_id]: badge
-				}))
-			})
-			setHasGlobalBadges(true)
-		})
-	}, [token])
+				}));
+			});
+			setHasGlobalBadges(true);
+		});
+	}, [token]);
 
 	useEffect(() => {
 		if (!token || !broadcasterID || !hasGlobalBadges) return;
 
 		get_channel_badges(broadcasterID, token).then((chanBadges) => {
-			const badgeList = Array.isArray(chanBadges) ? chanBadges : chanBadges?.data
+			const badgeList = Array.isArray(chanBadges)
+				? chanBadges
+				: chanBadges?.data;
 			badgeList.forEach((badge: IBadge) => {
 				setBadges((prevBadges) => ({
 					...prevBadges,
 					[badge.set_id]: badge
-				}))
-			})
-			setHasChannelBadges(true)
-		})
-	}, [token, broadcasterID, hasGlobalBadges])
+				}));
+			});
+			setHasChannelBadges(true);
+		});
+	}, [token, broadcasterID, hasGlobalBadges]);
 
 	// get socket
 	useEffect(() => {
