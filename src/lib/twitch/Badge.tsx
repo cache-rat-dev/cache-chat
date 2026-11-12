@@ -13,15 +13,12 @@ export interface IBadge {
 }
 
 export const get_global_badges = async (access_token: string) => {
-	const resp = await fetch(
-		`https://api.twitch.tv/helix/chat/badges/global`,
-		{
-			headers: {
-				"Authorization": `Bearer ${access_token}`,
-				"Client-Id": process.env.NEXT_PUBLIC_TWITCH_APP_ID ?? ""
-			}
+	const resp = await fetch(`https://api.twitch.tv/helix/chat/badges/global`, {
+		headers: {
+			"Authorization": `Bearer ${access_token}`,
+			"Client-Id": process.env.NEXT_PUBLIC_TWITCH_APP_ID ?? ""
 		}
-	);
+	});
 
 	if (!resp.ok) {
 		throw new Error(
@@ -30,10 +27,12 @@ export const get_global_badges = async (access_token: string) => {
 	}
 
 	return await resp.json();
+};
 
-}
-
-export const get_channel_badges = async (broadcaster_id: string, access_token: string) => {
+export const get_channel_badges = async (
+	broadcaster_id: string,
+	access_token: string
+) => {
 	const resp = await fetch(
 		`https://api.twitch.tv/helix/chat/badges?broadcaster_id=${broadcaster_id}`,
 		{
