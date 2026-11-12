@@ -26,7 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 			className={`${geistSans.variable} ${geistMono.variable}`}
 		>
 			<body>
-				<ChatProvider channel="shenpai">{children}</ChatProvider>
+				<ChatProvider channel="cache_rat">{children}</ChatProvider>
 			</body>
 		</html>
 	);

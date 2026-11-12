@@ -62,6 +62,11 @@ body {
 	background-color: white;
 }
 
+.content:has(> img:only-child) img {
+	width: 50px;
+	height: 50px;
+}
+
 .content * {
 	vertical-align: middle;
 }
