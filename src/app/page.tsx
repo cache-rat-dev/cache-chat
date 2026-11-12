@@ -63,36 +63,46 @@ function rgbToHue(r: number, g: number, b: number) {
 const Chat = () => {
 	const { messages, badges } = useChat();
 
-	const get_badge = (badge_string: string) => {
-		if (badge_string == "") return null
+	const get_badge = (badge_string: string, index: number) => {
+		if (badge_string == "") return null;
 		let [id, version] = badge_string.split("/");
-		let url = badges[id]?.versions.filter((v) => v.id == version)[0]
-			.image_url_1x;
+		let url;
+		try {
+			url = badges[id]?.versions.filter((v) => v.id == version)[0]
+				.image_url_1x;
+		} catch {
+			url = undefined;
+		}
 
-		return <img key={`${id}-${version}`} src={url} />;
+		return <img key={`${badge_string}-${index}`} src={url} />;
 	};
 
 	const css_gradient = (color: string) => {
-		if (color === "") color = '#ff0000';
+		if (color === "") color = "#ff0000";
 		const { r, g, b } = hexToRgb(color);
 		const hue = rgbToHue(r, g, b);
 
 		// return { '--gradient-stop-1': `hsl(${hue} 100% 25%)`, '--gradient-stop-2': `hsl(${hue - 36} 100% 41%)`} as CSSProperties
 		return {
-			background: `linear-gradient(to right, hsl(${hue} 100% 25%), hsl(${hue} 100% 41%))`,
+			background: `linear-gradient(to right, hsl(${hue} 100% 25%), hsl(${hue} 100% 41%))`
 		} as CSSProperties;
 		// return { 'background': `hsl(${hue} 100% 50%`}
 	};
 
 	return (
 		<div className="wrapper">
-			{messages.map((m) => (
-				<div key={m.meta?.id} className="message_container">
+			{messages.map((m, msgIndex) => (
+				<div
+					key={`${m.meta?.id || "msg"}-${msgIndex}`}
+					className="message_container"
+				>
 					<div
 						style={css_gradient(m.meta?.color)}
 						className="name_and_badges"
 					>
-						{m.badges.map((badge) => get_badge(badge))}{" "}
+						{m.badges.map((badge, badgeIndex) =>
+							get_badge(badge, badgeIndex)
+						)}{" "}
 						<span>{m.meta?.["display-name"]}</span>
 					</div>
 					<div className="content">{m.content}</div>
