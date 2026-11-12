@@ -1,3 +1,10 @@
+/**
+ * @module Emote
+ */
+
+/**
+ * Emote class. Used to parse an emote string and return an object with its ID, URL and its ranges in a {@link Message.Message}.
+ */
 export class Emote {
 	id: string;
 	url: string;

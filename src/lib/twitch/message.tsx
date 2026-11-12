@@ -1,12 +1,15 @@
+/**
+ * @module Message
+ */
 import { Emote } from "./Emote";
 
 export class Message {
 	meta: Record<string, any> = {};
+	badges!: string[];
 	type: string;
 	rawContent: string;
 	content!: React.ReactNode[] | string;
 
-	// Make constructor private so it's only called with valid data
 	private constructor(raw: string) {
 		const spaceIdx = raw.indexOf(" ");
 		const rawMeta = raw.slice(0, spaceIdx).trim();
@@ -28,6 +31,8 @@ export class Message {
 			}, {});
 
 		if (this.type === "PRIVMSG") {
+			this.badges = this.meta.badges.split(",")
+
 			this.meta.emotes = this.meta.emotes
 				? this.meta.emotes.split("/").map((e: string) => new Emote(e))
 				: undefined;
@@ -84,7 +89,6 @@ export class Message {
 		}
 	}
 
-	// Static factory method handles validation before instantiation
 	static fromRaw(raw: string): Message | null {
 		if (!raw.includes("ROOMSTATE") && !raw.includes("PRIVMSG")) {
 			return null;
