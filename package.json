@@ -1,8 +1,31 @@
 {
+	"name": "cache-chat",
+	"version": "0.1.0",
+	"private": true,
 	"scripts": {
-		"prettier": "prettier --write ."
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "prettier --write .",
+		"docs:watch": "typedoc --entryPointStrategy expand ./src --out docs --watch",
+		"docs:serve": "serve docs -l 8000",
+		"docs:dev": "concurrently \"npm run docs:serve\" \"npm run docs:watch\" "
 	},
 	"dependencies": {
-		"prettier": "^3.9.10"
+		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+		"concurrently": "^10.0.7",
+		"next": "16.4.5",
+		"prettier": "^3.9.10",
+		"react": "19.3.0",
+		"react-dom": "19.3.0",
+		"serve": "^14.2.7",
+		"typedoc": "^0.28.20"
+	},
+	"devDependencies": {
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"babel-plugin-react-compiler": "1.0.0",
+		"typescript": "^5"
 	}
 }
